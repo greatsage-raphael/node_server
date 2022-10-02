@@ -1,20 +1,34 @@
-var http = require('http');
-var url = require('url');
+const express = require('express')
+const app = express()
+const url = require('url');
 
-var store = {};
+const store = {}
 
-http.createServer(function (req, res) {
-    if (req.url == '/set') { //check the URL of the current request
 
-    const parsedUrl = url.parse(req.url, true).query;
-
-    for(key in parsedUrl){
-    	store[key] = parsedUrl[key];
+// respond with "hello world" when a GET request is made to the homepage
+app.get('/set', (req, res) => {
+    const setParsedUrl = url.parse(req.url, true).query;
+    for(key in setParsedUrl){
+    	store[key] = setParsedUrl[key];
+        res.send(store)
     }
-        
-    // set response header
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end(store);
-        
-    }
-}).listen(4000);
+  })
+
+
+  app.get('/get', (req, res) => {
+    const getParsedUrl = url.parse(req.url, true).query; //{ key: someKey}
+    const response = {};
+
+	for(key in getParsedUrl){
+		if(getParsedUrl[key] in store){
+			response[getParsedUrl[key]] = store[getParsedUrl[key]];
+        }
+        const json = JSON.stringify(response[getParsedUrl[key]]);
+        res.send(json)
+	}
+
+  })
+
+
+
+app.listen(7007);
